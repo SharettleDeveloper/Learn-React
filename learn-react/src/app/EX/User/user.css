@@ -1,0 +1,30 @@
+.user-profile-body {
+  width: 500px;
+  height: 200px;
+  background-color: #ffffff;
+  border-radius: 30px;
+}
+
+.user-profile-name {
+  text-align: center;
+  color: #000000;
+  padding: 10px;
+  font-size: large;
+  font-weight: bold;
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.avatar-small {
+  height: 50px;
+}
+
+.avatar-medium {
+  height: 70px;
+}
+
+.avatar-large {
+  height: 90px;
+}

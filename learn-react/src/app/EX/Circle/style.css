@@ -1,0 +1,73 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box; /* レイアウト崩れ防止 */
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #282c34; /* ゲームの背景色をダークに */
+}
+
+.square {
+  width: 60px;
+  height: 60px;
+  background-color: #61dafb; /* 青っぽい色で目立たせる */
+  color: #000000;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  margin: 5px;
+  border: 2px solid #282c34;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 立体感を追加 */
+  transition: background-color 0.2s ease, transform 0.2s ease; /* ホバー時のエフェクト */
+}
+
+.square:hover {
+  background-color: #21a1f1; /* ホバー時の背景色変更 */
+  transform: scale(1.1); /* クリック時の拡大感を追加 */
+  cursor: pointer;
+}
+
+.board-row {
+  display: flex;
+  justify-content: center;
+}
+
+.status {
+  color: #ffffff;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-info {
+  margin-top: 20px;
+  color: #ffffff;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #61dafb;
+  color: #000000;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #21a1f1;
+}
