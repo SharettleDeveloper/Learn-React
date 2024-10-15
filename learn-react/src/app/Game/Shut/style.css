@@ -1,0 +1,27 @@
+.game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+.player,
+.enemy,
+.bullet {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+}
+
+.player {
+  background: blue;
+}
+
+.enemy {
+  background: red;
+}
+
+.bullet {
+  background: yellow;
+}
