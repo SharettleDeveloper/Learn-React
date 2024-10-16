@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 
 import "./style.css";
+import { tree } from "next/dist/build/templates/app-page";
 
 interface Beam {
   x: number;
@@ -15,7 +16,6 @@ interface Enemy {
 
 const Game = () => {
   const [playerX, setPlayerX] = useState(50);
-  const [playerY, setPlayerY] = useState(10); // プレイヤーのY座標を管理
   const [beams, setBeams] = useState<Beam[]>([]);
   const [enemies, setEnemies] = useState<Enemy[]>([]);
   const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({});
@@ -52,7 +52,7 @@ const Game = () => {
         enemyX = Math.random() * 70;
       }
       setEnemies((prev) => [...prev, { x: enemyX, y: 100 }]);
-    }, 1000); // 敵の生成頻度を調整
+    }, 30); // 敵の生成頻度を調整
 
     return () => clearInterval(spawnEnemy);
   }, [isGameOver, playerX]);
@@ -60,8 +60,14 @@ const Game = () => {
   useEffect(() => {
     if (isGameOver) return;
 
+    const spawanEnemy = setInterval(() => {});
+  });
+
+  useEffect(() => {
+    if (isGameOver) return;
+
     const gameLoop = () => {
-      // プレイヤーの左右移動
+      // プレイヤーの移動
       if (keysPressed["ArrowLeft"]) {
         setPlayerX((prev) => Math.max(0, prev - 1));
       }
@@ -69,18 +75,10 @@ const Game = () => {
         setPlayerX((prev) => Math.min(100, prev + 1));
       }
 
-      // プレイヤーの上下移動
-      if (keysPressed["ArrowDown"]) {
-        setPlayerY((prev) => Math.min(90, prev + 1)); // 上方向に移動（画面上端を超えないように）
-      }
-      if (keysPressed["ArrowUp"]) {
-        setPlayerY((prev) => Math.max(0, prev - 1)); // 下方向に移動（画面下端を超えないように）
-      }
-
       // スペースキーでビームを発射（発射間隔の調整）
       const now = Date.now();
-      if (keysPressed[" "] && now - lastShotTime.current > 300) {
-        setBeams((prev) => [...prev, { x: playerX, y: playerY + 10 }]);
+      if (keysPressed[" "] && now - lastShotTime.current > 30) {
+        setBeams((prev) => [...prev, { x: playerX, y: 10 }]);
         lastShotTime.current = now;
       }
 
@@ -93,7 +91,7 @@ const Game = () => {
         const updatedEnemies = prev.map((enemy) => ({ ...enemy, y: enemy.y - 0.5 }));
 
         // プレイヤーと敵の当たり判定
-        const playerHit = updatedEnemies.some((enemy) => Math.abs(enemy.x - playerX) < 5 && enemy.y <= playerY + 10);
+        const playerHit = updatedEnemies.some((enemy) => Math.abs(enemy.x - playerX) < 5 && enemy.y <= 10);
         if (playerHit) {
           setIsGameOver(true);
           return updatedEnemies; // ここで停止し、アニメーションを止めるために早期リターン
@@ -104,7 +102,7 @@ const Game = () => {
           const hitIndex = beams.findIndex((beam) => Math.abs(beam.x - enemy.x) < 5 && Math.abs(beam.y - enemy.y) < 5);
           if (hitIndex !== -1) {
             setBeams((prevBeams) => prevBeams.filter((_, index) => index !== hitIndex)); // 当たったビームを消去
-            setPoints((prev) => prev + 10); // 敵を倒したらポイント加算
+            setPoints((prev) => prev + 75); // 敵を倒したらポイント加算
             return false; // 当たった敵を消去
           }
           return enemy.y > 0; // 画面外に出た敵を削除
@@ -123,7 +121,7 @@ const Game = () => {
         cancelAnimationFrame(requestId.current);
       }
     };
-  }, [keysPressed, playerX, playerY, isGameOver, beams, enemies]);
+  }, [keysPressed, playerX, isGameOver, beams, enemies]);
 
   if (isGameOver) {
     return (
@@ -142,8 +140,8 @@ const Game = () => {
         className="player"
         style={{
           left: `${playerX}%`,
-          top: `${playerY}%`,
           position: "absolute",
+          bottom: "10px",
           width: "50px",
           height: "50px",
           borderRadius: "25px",
@@ -176,8 +174,9 @@ const Game = () => {
             left: `${enemy.x}%`,
             bottom: `${enemy.y}%`,
             position: "absolute",
-            width: "40px",
-            height: "40px",
+            width: "50px",
+            height: "50px",
+            borderRadius: "10px",
             backgroundColor: "green",
           }}
         />
