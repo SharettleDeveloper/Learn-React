@@ -1,7 +1,6 @@
 "use client"; // Next.jsのApp Routerで、クライアントコンポーネントとして使う
 
-import React, { useState, useEffect, ChangeEvent, KeyboardEvent, useCallback } from "react";
-import { start } from "repl";
+import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
 
 const TypingGame: React.FC = () => {
   // ■ 1. 状態を定義
@@ -30,12 +29,11 @@ const TypingGame: React.FC = () => {
     };
   }, [isPlaying, timeLeft]);
 
-  if (!isPlaying) {
-  }
-
+  // ■ 3. ゲーム開始イベントハンドラー（スペースキー）
   useEffect(() => {
     const handleSpaceKey = (e: globalThis.KeyboardEvent) => {
       if (e.code === "Space" && !isPlaying) {
+        e.preventDefault(); // スペースキーによるページスクロールを防ぐ
         startGame();
       }
       if (e.code === "Escape" && isPlaying) {
@@ -49,30 +47,48 @@ const TypingGame: React.FC = () => {
     };
   }, [isPlaying]);
 
-  // ■ 3. 入力文字の変更処理
+  // ■ 4. 入力文字の変更処理
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUserInput(e.target.value);
-  };
+    const value = e.target.value;
+    const targetWord = textList[currentIndex];
+    const previousInput = userInput;
 
-  // ■ 4. エンターキー押下時の処理
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      checkAnswer();
+    if (value.length < previousInput.length) {
+      // ユーザーが削除した場合
+      setUserInput(value);
+      return;
     }
-  };
 
-  // ■ 5. 正誤判定
-  const checkAnswer = () => {
-    if (userInput.trim().toLowerCase() === textList[currentIndex].toLowerCase()) {
-      setCorrectCount((prev) => prev + 1);
+    if (value.length > targetWord.length) {
+      // 入力がターゲット単語の長さを超えた場合は無視
+      return;
+    }
+
+    const currentPos = value.length - 1;
+    const newChar = value[currentPos];
+
+    if (newChar.toLowerCase() === targetWord[currentPos].toLowerCase()) {
+      // 正しい文字が入力された場合
+      setUserInput(value);
     } else {
+      // 間違った文字が入力された場合
       setMissCount((prev) => prev + 1);
+      // 入力を更新せず、誤った文字は無視
     }
-
-    // 次の単語へ
-    setUserInput("");
-    setCurrentIndex((prev) => (prev + 1) % textList.length);
   };
+
+  // ■ 5. 正誤判定と自動次の単語への移行
+  useEffect(() => {
+    const targetWord = textList[currentIndex];
+    if (userInput.length === targetWord.length) {
+      if (userInput.toLowerCase() === targetWord.toLowerCase()) {
+        setCorrectCount((prev) => prev + 1);
+      }
+      // 次の単語へ即座に移行
+      setUserInput("");
+      setCurrentIndex((prev) => (prev + 1) % textList.length);
+    }
+  }, [userInput, textList, currentIndex]);
 
   // ■ 6. ゲーム開始ボタン
   const startGame = useCallback(() => {
@@ -84,21 +100,47 @@ const TypingGame: React.FC = () => {
     setUserInput("");
   }, []);
 
+  // ■ 7. 単語の表示（入力済み文字を色分け）
+  const renderWord = () => {
+    const targetWord = textList[currentIndex];
+    const letters = targetWord.split("");
+
+    return (
+      <div className="text-lg">
+        {letters.map((char, index) => {
+          const userChar = userInput[index];
+          let className = "text-gray-400"; // 未入力の文字は薄いグレー
+
+          if (userChar) {
+            if (userChar.toLowerCase() === char.toLowerCase()) {
+              className = "text-blue-600"; // 正しい文字は青色
+            }
+            // 間違った文字は既に入力が拒否されているため不要
+          }
+
+          return (
+            <span key={index} className={className}>
+              {char}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto p-4 bg-white rounded shadow flex justify-center ">
+    <div className="w-full max-w-md mx-auto p-4 bg-white rounded shadow flex flex-col items-center">
       {!isPlaying && (
-        <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 " onClick={startGame}>
+        <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-4" onClick={startGame}>
           ゲーム開始
         </button>
       )}
 
       {isPlaying && (
-        <div>
+        <div className="w-full">
           <div className="text-center mb-4">
             <h2 className="text-xl font-semibold">残り時間: {timeLeft}秒</h2>
-            <h3 className="text-lg">
-              単語: <span className="font-bold text-blue-600">{textList[currentIndex]}</span>
-            </h3>
+            <h3 className="text-lg">単語: {renderWord()}</h3>
           </div>
 
           <div className="mb-4">
@@ -108,7 +150,6 @@ const TypingGame: React.FC = () => {
               placeholder="ここに入力"
               value={userInput}
               onChange={handleChange}
-              onKeyDown={handleKeyDown}
               autoFocus
             />
           </div>
@@ -117,6 +158,17 @@ const TypingGame: React.FC = () => {
             <p className="text-green-600 font-semibold">正解数: {correctCount}</p>
             <p className="text-red-600 font-semibold">ミス数: {missCount}</p>
           </div>
+        </div>
+      )}
+
+      {!isPlaying && timeLeft === 0 && (
+        <div className="text-center mt-4">
+          <h2 className="text-xl font-semibold">ゲーム終了！</h2>
+          <p className="text-lg">正解数: {correctCount}</p>
+          <p className="text-lg">ミス数: {missCount}</p>
+          <button className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" onClick={startGame}>
+            もう一度プレイ
+          </button>
         </div>
       )}
     </div>
