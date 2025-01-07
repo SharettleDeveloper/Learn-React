@@ -4,7 +4,25 @@ import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
 
 const TypingGame: React.FC = () => {
   // ■ 1. 状態を定義
-  const [textList] = useState<string[]>(["apple", "banana", "cherry", "dog", "elephant"]);
+  const [textList] = useState<string[]>([
+    "arata",
+    "raimu",
+    "wakana",
+    "sawaniwann",
+    "mayugonn",
+    "kazuhiko",
+    "zinnsei",
+    "raimunomirai",
+    "renntyann",
+    "anntyann",
+    "yossi",
+    "shigeko",
+    "cindy",
+    "miwamayumi",
+    " .        ",
+    "fbdubjrtgbvnjdfy",
+  ]);
+
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [userInput, setUserInput] = useState<string>("");
   const [correctCount, setCorrectCount] = useState<number>(0);
@@ -93,7 +111,7 @@ const TypingGame: React.FC = () => {
   // ■ 6. ゲーム開始ボタン
   const startGame = useCallback(() => {
     setIsPlaying(true);
-    setTimeLeft(30);
+    setTimeLeft(40);
     setCorrectCount(0);
     setMissCount(0);
     setCurrentIndex(0);
