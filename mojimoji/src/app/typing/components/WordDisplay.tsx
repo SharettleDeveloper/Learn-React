@@ -1,6 +1,7 @@
 "use client"; // Next.jsのApp Routerで、クライアントコンポーネントとして使う
 
 import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from "react";
+import { text } from "stream/consumers";
 
 const TypingGame: React.FC = () => {
   // ■ 1. 状態を定義
